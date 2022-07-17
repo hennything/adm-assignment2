@@ -1,0 +1,43 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2513
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 Initialisation:\
+	1. matrix is loaded in and converted into a sparse column matrix.\
+	2. the movies watched by a user is then stored in a dictionary (used later on for calculating the true jacquard similarity)\
+\
+minHash:\
+	1. Initialise the signature matrix with zeros. \
+	2. for each row of the signature matrix\
+		- the sparse column matrix has its row index values randomly permuted\
+		- then for each user we get the index value of the first non-zero element in the randomly permuted sparse matrix. (By using the pointers available in script spare column matrix we are able to efficiently access the index values of the non-zero elements for a user, we then take the minimum number in the list of indices to indicate the index value of the first non-zero element )\
+\
+LSH:\
+	1. Initialise the leh matrix with zeros.\
+	2. we enumerate through the number of rows in the signature matrix by the row size \
+		- and for each user we hash the corresponding rows by first converting the list of signatures into bytes. (In the end the leh matrix contains the same number of rows as there are bands and n columns where n is the number of users)\
+\
+Pairs/similiarty search:\
+	1.  We initialise 2 sets 1 containing the actual pairs found and the other containing the pairs which are treated throughout the run. (We do that so we don\'92t treat the same pair twcie)\
+	2.  We iterate through each band in the lsh_matrix  and we select only the buckets in each band which have more than 1 values hashed into it,\
+		- we retrieve the index values of a users which share buckets and then use that to iterate through all possible combination of user pairs where u1 < u2.\
+		- at this point if a pair has not been treated before it is added to the set of treated pairs\
+		- after which the similarity score between the pair is calculated using the signatur matrix\
+		- if the similarity score is above 0.4 then the true similarity score of the pair is calculated using the sparse column matrix and if the score if above 0.5 the pairs is then added to the set of pairs found so far and appended to the text file. \
+\
+\
+randomProjections (used for cs and dcs instead of minhashing):\
+	1. A random vector is created containing a normal distribution of 1 and -1. The length of this vector is the same as the number of movies in the dataset. \
+	2. For each user \
+		- we get the induce values of the non zero-elements *\
+		- we get the actual data of the non-zero elements\
+		- we perform the dot product of the random vector using the same indices as (*) with the actual ratings of the user\
+		- if the dot product is positive we assign a 1 in the signature matrix for that user\
+		- if the donut product is negative we assign a -1 in the signature matrix for that user \
+		- in the odd chance that the dot product is 0 we then assign randomly a 1 or -1\
+\
+\
+}
